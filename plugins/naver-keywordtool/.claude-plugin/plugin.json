@@ -1,7 +1,7 @@
 {
   "name": "naver-keywordtool",
   "description": "네이버 검색광고 API로 연관 키워드·월간 검색량(PC/모바일)을 실측 조회하고, GEO 목표 프롬프트 후보(질문형)까지 제안하는 스킬. 최초 1회 API 키 등록만 하면 된다.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "MADUP DCT",
     "email": "dc_team@madup.com"
