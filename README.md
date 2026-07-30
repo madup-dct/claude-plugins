@@ -15,9 +15,11 @@ Claude Code에서:
 
 ## 플러그인 목록
 
-| 플러그인 | 설명 |
-|---|---|
-| `naver-keywordtool` | 네이버 검색광고 API 연관 키워드·검색량 실측 + GEO 프롬프트 제안. 최초 1회 API 키 등록 필요 — 설치 후 Claude Code에 "네이버 키워드툴 세팅해줘"라고 치면 안내받으며 진행. |
+| 플러그인 | 설명 | 설치 |
+|---|---|---|
+| `naver-keywordtool` | 네이버 검색광고 API 연관 키워드·검색량 실측 + GEO 프롬프트 제안. 최초 1회 API 키 등록 필요 — 설치 후 "네이버 키워드툴 세팅해줘"라고 치면 안내받으며 진행. | `/plugin install naver-keywordtool@madup` |
+| `copy-tone-gate` | 슬라이드·제안서 카피의 AI 말투 게이트. "카피 말투 게이트 돌려줘", "AI 티 나는 워딩 고쳐줘"라고 치면 소리 테스트 + 금지 패턴 7종으로 교정. | `/plugin install copy-tone-gate@madup` |
+| `humanize-korean` | AI가 쓴 한글 장문 윤문. "AI 티 없애줘", "사람이 쓴 것처럼 윤문해줘"라고 치면 40+ 패턴 탐지 후 내용 보존 재작성. | `/plugin install humanize-korean@madup` |
 
 ## 사용 예
 

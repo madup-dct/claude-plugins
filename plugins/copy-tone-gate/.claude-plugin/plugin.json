@@ -1,0 +1,9 @@
+{
+  "name": "copy-tone-gate",
+  "description": "슬라이드·제안서·카피의 AI 말투를 잡는 말투 게이트. 소리 테스트(발표자가 입으로 말할 수 있는가) + 금지 패턴 7종으로 헤드라인·리드를 사람 말로 교정한다.",
+  "version": "1.0.0",
+  "author": {
+    "name": "MADUP DCT",
+    "email": "dc_team@madup.com"
+  }
+}

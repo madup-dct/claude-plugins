@@ -1,0 +1,9 @@
+{
+  "name": "humanize-korean",
+  "description": "AI가 쓴 한글 텍스트의 '티'를 제거하는 윤문 오케스트레이터. 10대 카테고리 40+ AI 티 패턴을 탐지해 내용은 그대로 두고 문체·리듬만 사람이 쓴 글처럼 재작성한다. 측정 스크립트(metrics)로 전후 정량 비교까지.",
+  "version": "1.5.0",
+  "author": {
+    "name": "MADUP DCT",
+    "email": "dc_team@madup.com"
+  }
+}
