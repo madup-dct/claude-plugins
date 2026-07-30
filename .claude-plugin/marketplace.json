@@ -1,0 +1,16 @@
+{
+  "name": "madup",
+  "description": "매드업 DCT 팀 Claude Code 플러그인 — 검색광고·GEO 실무 도구 모음",
+  "owner": {
+    "name": "MADUP DCT",
+    "email": "dc_team@madup.com"
+  },
+  "plugins": [
+    {
+      "name": "naver-keywordtool",
+      "source": "./plugins/naver-keywordtool",
+      "description": "네이버 검색광고 API로 연관 키워드·월간 검색량 실측 조회 + GEO 목표 프롬프트 제안. API 키만 등록하면 사용 가능.",
+      "version": "1.0.0"
+    }
+  ]
+}
