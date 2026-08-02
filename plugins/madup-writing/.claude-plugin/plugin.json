@@ -1,0 +1,9 @@
+{
+  "name": "madup-writing",
+  "description": "슬랙·보고서·제안서용 한글 실무 문안을 매드업 톤으로 정리하는 글쓰기 스킬. 사실·숫자는 그대로 두고 결론과 액션이 먼저 보이게 다듬는다.",
+  "version": "1.1.0",
+  "author": {
+    "name": "MADUP DCT",
+    "email": "dc_team@madup.com"
+  }
+}

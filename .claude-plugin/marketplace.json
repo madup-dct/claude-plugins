@@ -23,6 +23,12 @@
       "source": "./plugins/humanize-korean",
       "description": "AI가 쓴 한글 장문의 티를 제거하는 윤문 오케스트레이터 — 40+ 패턴 탐지, 내용 보존, 전후 정량 측정.",
       "version": "1.5.1"
+    },
+    {
+      "name": "madup-writing",
+      "source": "./plugins/madup-writing",
+      "description": "슬랙·보고서·제안서용 한글 실무 문안을 매드업 톤으로 정리하는 글쓰기 스킬 — 사실·숫자는 그대로 두고 결론과 액션이 먼저 보이게 다듬음.",
+      "version": "1.1.0"
     }
   ]
 }
