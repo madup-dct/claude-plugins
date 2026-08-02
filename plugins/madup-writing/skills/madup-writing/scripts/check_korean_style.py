@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Advisory checker for common Korean business-writing style smells."""
+"""Advisory checker for common Korean business-writing style smells.
+
+Paired quote spans ("...", '...', “...”, ‘...’, 「...」, 『...』) are masked
+before pattern matching: quoted wording is a locked fact under the skill
+contract, so the checker never advises rewriting it.
+"""
 
 from __future__ import annotations
 
@@ -21,20 +26,51 @@ INFLATED_CLAIM_PATTERNS = (
     re.compile(r"혁신적(?:인|으로)?"),
     re.compile(r"시너지를\s*극대화"),
     re.compile(r"한\s*단계\s*끌어올리"),
+    re.compile(r"압도적(?:인|으로)?"),
+    re.compile(r"획기적(?:인|으로)?"),
+    re.compile(r"시사하는\s*바"),
+    re.compile(r"주목할\s*만"),
+    re.compile(r"지금이야말로"),
 )
 
 TRANSLATION_LIKE_PATTERNS = (
     re.compile(r"본\s*프로젝트를\s*통해"),
     re.compile(r"본\s*제안(?:은|안은)"),
-    re.compile(r"제공했(?:습니다|고)"),
+    re.compile(r"(?:가치|인사이트|시사점|경험|솔루션|가능성|기회)[을를]?\s*제공했"),
     re.compile(r"기반을\s*마련"),
+    re.compile(r"(?:되어|돼)(?:진다|집니다|집니까|질|졌|지고|지며)"),
+    re.compile(r"보여집니"),
 )
 
 EXCESSIVE_FORMATTING_PATTERNS = (
     re.compile(r"^\s*#{2,}\s*[^#\s].*?\s*#{2,}\s*$"),
-    re.compile(r"[!?.]{3,}"),
+    re.compile(r"[!?]{3,}"),
     re.compile(r"(?:[*_~]){3,}"),
 )
+
+CANNED_STRUCTURE_PATTERNS = (
+    re.compile(r"(?:단순한|단순히|그저|한낱)\s+[^\n.!?]{0,24}(?:이|가)\s*아니라"),
+    re.compile(r"^\s*(?:결론적으로|종합하면|요약하자면)[,\s]"),
+)
+
+SENTENCE_INITIAL_CONNECTIVE = re.compile(r"^\s*(?:또한|그리고|하지만|따라서)[,\s]")
+
+QUOTED_SPAN_PATTERNS = (
+    re.compile(r"\"[^\"\n]*\""),
+    re.compile(r"'[^'\n]*'"),
+    re.compile(r"“[^”\n]*”"),
+    re.compile(r"‘[^’\n]*’"),
+    re.compile(r"「[^」\n]*」"),
+    re.compile(r"『[^』\n]*』"),
+)
+
+
+def _mask_quoted_spans(line: str) -> str:
+    """Blank out paired quote spans so locked quotations are never flagged."""
+    masked = line
+    for pattern in QUOTED_SPAN_PATTERNS:
+        masked = pattern.sub(lambda match: " " * len(match.group(0)), masked)
+    return masked
 
 
 def _make_finding(rule: str, severity: str, line_no: int, text: str, suggestion: str) -> dict[str, object]:
@@ -62,13 +98,17 @@ def analyze_text(text: str) -> list[dict[str, object]]:
     """Return candidate style findings without claiming authorship."""
 
     findings: list[dict[str, object]] = []
+    connective_hits: list[tuple[int, str]] = []
+    enumeration_hit: tuple[int, str] | None = None
 
     for line_no, raw_line in enumerate(text.splitlines(), start=1):
         line = raw_line.strip()
         if not line:
             continue
 
-        if any(pattern.search(line) for pattern in EMPTY_TRANSITION_PATTERNS):
+        scan_line = _mask_quoted_spans(line)
+
+        if any(pattern.search(scan_line) for pattern in EMPTY_TRANSITION_PATTERNS):
             findings.append(
                 _make_finding(
                     "empty_transition",
@@ -79,18 +119,18 @@ def analyze_text(text: str) -> list[dict[str, object]]:
                 )
             )
 
-        if any(pattern.search(line) for pattern in INFLATED_CLAIM_PATTERNS):
+        if any(pattern.search(scan_line) for pattern in INFLATED_CLAIM_PATTERNS):
             findings.append(
                 _make_finding(
                     "inflated_claim",
                     "medium",
                     line_no,
                     line,
-                    "과장 표현을 빼고 근거가 되는 사실이나 관찰을 먼저 쓰세요.",
+                    "과장 표현을 빼고 근거가 되는 사실이나 관찰을 먼저 쓰세요. 광고주가 확정한 카피나 인용이면 그대로 두세요.",
                 )
             )
 
-        if any(pattern.search(line) for pattern in TRANSLATION_LIKE_PATTERNS):
+        if any(pattern.search(scan_line) for pattern in TRANSLATION_LIKE_PATTERNS):
             findings.append(
                 _make_finding(
                     "translation_like_phrase",
@@ -103,7 +143,7 @@ def analyze_text(text: str) -> list[dict[str, object]]:
 
         if (
             not _is_regular_markdown_line(line)
-            and any(pattern.search(line) for pattern in EXCESSIVE_FORMATTING_PATTERNS)
+            and any(pattern.search(scan_line) for pattern in EXCESSIVE_FORMATTING_PATTERNS)
         ):
             findings.append(
                 _make_finding(
@@ -115,6 +155,46 @@ def analyze_text(text: str) -> list[dict[str, object]]:
                 )
             )
 
+        if any(pattern.search(scan_line) for pattern in CANNED_STRUCTURE_PATTERNS):
+            findings.append(
+                _make_finding(
+                    "canned_structure",
+                    "medium",
+                    line_no,
+                    line,
+                    "기계적인 구조(부정 병렬, 상투적 마무리)를 풀고 내용이 앞서는 문장으로 쓰세요.",
+                )
+            )
+
+        if enumeration_hit is None and "첫째," in scan_line:
+            enumeration_hit = (line_no, line)
+
+        if SENTENCE_INITIAL_CONNECTIVE.search(scan_line):
+            connective_hits.append((line_no, line))
+
+    if enumeration_hit is not None and "둘째," in text:
+        findings.append(
+            _make_finding(
+                "canned_structure",
+                "medium",
+                enumeration_hit[0],
+                enumeration_hit[1],
+                "첫째/둘째/셋째 기계 나열 대신 내용 순서가 스스로 드러나는 문장으로 쓰세요.",
+            )
+        )
+
+    if len(connective_hits) >= 2:
+        findings.append(
+            _make_finding(
+                "sentence_initial_connectives",
+                "medium",
+                connective_hits[0][0],
+                connective_hits[0][1],
+                "문장 첫머리 접속사를 줄이고 문장 순서로 흐름을 보여주세요.",
+            )
+        )
+
+    findings.sort(key=lambda item: item["line"])
     return findings
 
 

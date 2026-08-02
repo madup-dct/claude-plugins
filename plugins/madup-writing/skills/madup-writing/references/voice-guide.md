@@ -18,6 +18,7 @@
 - Keep the path clear: context -> impact -> action or owner.
 - A short message can stay as one paragraph. Force bullets only when there are multiple actions or owners.
 - Favor direct wording such as "일정이 이틀 밀렸습니다" over preambles like "먼저, 결론부터 말씀드리겠습니다."
+- A brand-new email to an external recipient may open with one short greeting and close with one short sign-off; a rewrite keeps whatever the source already does.
 
 ## Mode 2: Report
 
@@ -50,3 +51,16 @@
 - A short support line is fine when the headline alone is too thin, but keep the pair easy to say in one breath.
 - Separate advertiser, internal, Q&A, or talk-track views only when requested or already present in the source.
 - Reserve dramatic phrasing for cases where the user explicitly wants it.
+
+## AI Tells to Strip
+
+Documented tells of machine-written Korean business copy. Remove them unless the source itself supplies the wording as a locked fact.
+
+- Negative parallelism: `단순한 A가 아니라 B`, `그저 A가 아닌 B` — direct translations of "not just X, but Y".
+- Mechanical enumeration: `첫째, ... 둘째, ... 셋째, ...` in short copy that never needed a numbered frame.
+- Canned closers: `결론적으로`, `종합하면`, `요약하자면` opening the final sentence.
+- Sentence-initial connective chains: consecutive sentences opening with `또한`, `그리고`, `따라서`, `하지만`.
+- Free-floating evaluation: `시사하는 바가 큽니다`, `주목할 만합니다` attached to no concrete fact.
+- Double passive: `~되어집니다`, `~보여집니다` — use the active or single passive form.
+- Hype twins: `압도적인`, `획기적인`, `혁신적인`, `시너지 극대화`, `지금이야말로 ~할 때`.
+- Decorative formatting: bold on every key noun, emoji as section markers, bullets where two sentences read faster.

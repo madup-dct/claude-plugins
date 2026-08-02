@@ -21,7 +21,7 @@ MARKETPLACE_PATH = REPO_ROOT / ".claude-plugin" / "marketplace.json"
 README_PATH = REPO_ROOT / "README.md"
 
 EXPECTED_PLUGIN_NAME = "madup-writing"
-EXPECTED_VERSION = "1.1.0"
+EXPECTED_VERSION = "1.2.0"
 EXPECTED_AUTHOR = {
     "name": "MADUP DCT",
     "email": "dc_team@madup.com",
@@ -296,6 +296,39 @@ class TestMadupWritingCheckerBehavior(unittest.TestCase):
                 "excessive_formatting",
             },
         )
+
+    def test_analyze_text_masks_locked_quotes_and_allows_plain_business_sentences(self):
+        checker = _load_checker_module()
+        clean_cases = (
+            '광고주 확정 카피는 "업계를 선도할 프리미엄 캠페인"입니다. 이 문구는 그대로 유지해주세요.',
+            "정부의 '혁신적 포용국가' 기조에 맞춘 캠페인입니다.",
+            "지난주 광고주에 4월 성과 리포트를 제공했습니다.",
+            "일정이 좀 밀릴 것 같습니다... 내일 다시 공유드릴게요.",
+            "첫째 주 성과는 둘째 주와 비슷했습니다.",
+        )
+        for case in clean_cases:
+            with self.subTest(case=case):
+                self.assertEqual(checker.analyze_text(case), [])
+
+    def test_analyze_text_flags_documented_ai_tells(self):
+        checker = _load_checker_module()
+        flagged_cases = (
+            ("다양한 시사점을 제공했습니다.", "translation_like_phrase"),
+            ("성과가 점진적으로 개선되어질 것으로 보여집니다.", "translation_like_phrase"),
+            ("이번 테스트 결과는 시사하는 바가 큽니다.", "inflated_claim"),
+            ("압도적인 성과와 획기적인 개선을 확인했습니다.", "inflated_claim"),
+            ("단순한 광고가 아니라 브랜드 경험입니다.", "canned_structure"),
+            ("결론적으로, 이번 분기 목표는 달성 가능합니다.", "canned_structure"),
+            ("첫째, 예산을 정리합니다. 둘째, 소재를 교체합니다.", "canned_structure"),
+            (
+                "또한 예산을 늘렸습니다.\n그리고 소재를 교체했습니다.\n따라서 성과가 났습니다.",
+                "sentence_initial_connectives",
+            ),
+        )
+        for text, rule in flagged_cases:
+            with self.subTest(rule=rule, text=text):
+                rules = {item["rule"] for item in checker.analyze_text(text)}
+                self.assertIn(rule, rules)
 
     def test_analyze_text_never_claims_ai_authorship(self):
         checker = _load_checker_module()
