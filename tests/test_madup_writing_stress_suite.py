@@ -77,7 +77,7 @@ class TestMadupWritingStressSuitePackaging(unittest.TestCase):
 
         self.assertEqual(manifest["schema_version"], "1.1.0")
         self.assertEqual(manifest["generator_version"], "1.3.0")
-        self.assertEqual(manifest["oracle_version"], "1.4.0")
+        self.assertEqual(manifest["oracle_version"], "1.5.0")
         self.assertEqual(manifest["suite_seed"], "madup-writing-stress-v1")
         self.assertEqual(manifest["case_count"], 1000)
         self.assertEqual(manifest["mode_counts"], EXPECTED_MODE_COUNTS)
@@ -821,7 +821,7 @@ class TestMadupWritingStressSuiteLiveRunner(unittest.TestCase):
         self.assertEqual(payload["contract"]["schema_version"], "1.1.0")
         self.assertEqual(payload["contract"]["generator_version"], "1.3.0")
         self.assertEqual(len(payload["contract"]["snapshot_sha256"]), 64)
-        self.assertEqual(payload["contract"]["oracle_version"], "1.4.0")
+        self.assertEqual(payload["contract"]["oracle_version"], "1.5.0")
         self.assertEqual(len(payload["contract"]["oracle_sha256"]), 64)
         self.assertEqual(
             runner.DEFAULT_OUTPUT_ROOT,
@@ -1260,7 +1260,7 @@ class TestMadupWritingStressSuiteLiveRegrader(unittest.TestCase):
         self.assertEqual(summary["oracle_contract"]["schema_version"], "1.1.0")
         self.assertEqual(summary["oracle_contract"]["generator_version"], "1.3.0")
         self.assertEqual(len(summary["oracle_contract"]["snapshot_sha256"]), 64)
-        self.assertEqual(summary["oracle_contract"]["oracle_version"], "1.4.0")
+        self.assertEqual(summary["oracle_contract"]["oracle_version"], "1.5.0")
         self.assertEqual(len(summary["oracle_contract"]["oracle_sha256"]), 64)
         self.assertEqual(summary["source_run_id"], "source")
         self.assertNotIn(str(Path(temp_dir).resolve()), json.dumps(summary))

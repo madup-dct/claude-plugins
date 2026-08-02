@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent
-ORACLE_VERSION = "1.4.0"
+ORACLE_VERSION = "1.5.0"
 REQUIRED_KEYS = {
     "id",
     "mode",
@@ -25,12 +25,14 @@ REQUIRED_KEYS = {
     "style",
     "stratum",
 }
-SENTENCE_SPLIT = re.compile(r"[.!?]\s+|\n+")
+SENTENCE_SPLIT = re.compile(r"[.!?]\s+|[.!?](?=[A-Z가-힣])|(?<=[가-힣])[.!?](?=\d)|\n+")
 NON_EMPTY_LINE = re.compile(r"\S")
 CALENDAR_DATE = re.compile(r"(?<!\d)(?:\d{1,2}월\s*\d{1,2}일|\d{1,2}/\d{1,2})(?!\d)")
 COMPARISON_PHRASE = re.compile(
-    r"(?P<reference>전년|전월|전주|전일|전분기|이전|직전|목표|업계\s*평균|지난\s*분기|지난\s*달|지난\s*주|지난\s*해)\s*대비"
+    r"(?P<reference>전년|전월|전주|전일|전분기|이전|직전|목표|업계\s*평균|지난\s*분기|지난\s*달|지난\s*주|지난\s*해)\s*(?:대비|보다)"
 )
+POLITE_ENDING = re.compile(r"(?:습니다|니다|세요|어요|아요|여요|해요|이에요|예요|까요|시죠)")
+BANMAL_FINAL_CHARS = "어아게줘봐야"
 UNSUPPORTED_METRIC_CLAIM_PATTERNS = {
     "benchmark": re.compile(
         r"(?:업계|시장|동종\s*업계|경쟁사)\s*(?:평균|기준|벤치마크|수준)"
@@ -117,6 +119,19 @@ def _shape_content_lines(text: str, submode: object) -> list[str]:
         inline_match = INLINE_FIELD_LABEL.fullmatch(line)
         content_lines.append(inline_match.group(1).strip() if inline_match else line)
     return content_lines
+
+
+def _register_violation(lines: list[str]) -> bool:
+    """True when content sentences end in banmal and no polite ending appears."""
+    joined = "\n".join(lines)
+    if POLITE_ENDING.search(joined):
+        return False
+    for line in lines:
+        for chunk in SENTENCE_SPLIT.split(line):
+            chunk = chunk.strip().rstrip(".!?…").rstrip()
+            if chunk and chunk[-1] in BANMAL_FINAL_CHARS:
+                return True
+    return False
 
 
 def _comparison_categories(text: str) -> set[str]:
@@ -288,7 +303,7 @@ def evaluate_response(case: dict[str, object], response_text: str) -> dict[str, 
             }
         )
 
-    if case.get("submode") == "presentation":
+    if case.get("submode") in {"presentation", "report"}:
         supplied_metric_claims = _unsupported_metric_claim_categories(
             str(case.get("prompt", ""))
         )
@@ -323,6 +338,40 @@ def evaluate_response(case: dict[str, object], response_text: str) -> dict[str, 
         if body_expected and body_count != body_expected:
             hard_failures.append({"check": "shape", "reason": "body_sentence_count", "actual": body_count, "expected": body_expected})
 
+    submode = case.get("submode")
+    if submode in {"email", "slack"} and _register_violation(lines):
+        register_record = {
+            "check": "register",
+            "reason": "banmal_without_polite_ending",
+        }
+        if submode == "email":
+            hard_failures.append(register_record)
+        else:
+            advisory_findings.append(
+                {
+                    "rule": "register_risk",
+                    "severity": "medium",
+                    "line": 0,
+                    "text": lines[0] if lines else "",
+                    "suggestion": "격식 문안인데 반말 종결이 섞였습니다. 요청된 레지스터를 유지하세요.",
+                }
+            )
+
+    for line in _non_empty_lines(response_text):
+        if FIELD_LABEL_LINE.fullmatch(line) or INLINE_FIELD_LABEL.fullmatch(line) or (
+            submode == "email"
+            and (EMAIL_SUBJECT_LINE.fullmatch(line) or EMAIL_SCAFFOLD_LINE.fullmatch(line))
+        ):
+            advisory_findings.append(
+                {
+                    "rule": "scaffolding_normalized",
+                    "severity": "low",
+                    "line": 0,
+                    "text": line,
+                    "suggestion": "요청에 없는 라벨/인사 스캐폴딩입니다. 계약상 요청 시에만 넣으세요.",
+                }
+            )
+
     if STYLE_CHECKER is not None:
         advisory_findings.extend(STYLE_CHECKER(response_text))
 
@@ -341,6 +390,9 @@ def run_self_tests() -> bool:
         assert evaluate_response(case, reference)["passed"]
         assert not evaluate_response(case, make_locked_token_mutant(case, reference))["passed"]
         assert not evaluate_response(case, make_first_forbidden_marker_mutant(case, reference))["passed"]
+    assert _count_sentences("공유드립니다.QA에서 확인했습니다.1차 배포는 미룹니다.") == 3
+    assert _register_violation(["예산안 검토 마쳤어", "내일 다시 공유할게"])
+    assert not _register_violation(["예산안 검토를 마쳤습니다.", "내일 다시 공유하겠습니다."])
     return True
 
 
