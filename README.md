@@ -21,6 +21,7 @@ Claude Code에서:
 | `copy-tone-gate` | 슬라이드·제안서 카피의 AI 말투 게이트. "카피 말투 게이트 돌려줘", "AI 티 나는 워딩 고쳐줘"라고 치면 소리 테스트 + 금지 패턴 7종으로 교정. | `/plugin install copy-tone-gate@madup` |
 | `humanize-korean` | AI가 쓴 한글 장문 윤문. "AI 티 없애줘", "사람이 쓴 것처럼 윤문해줘"라고 치면 40+ 패턴 탐지 후 내용 보존 재작성. | `/plugin install humanize-korean@madup` |
 | `madup-writing` | 슬랙·보고서·제안서·발표 카피용 한글 실무 문안을 매드업 톤으로 정리. "문장만 정리해줘", "제안서 말투로 다듬어줘", "발표 카피 다듬어줘"라고 치면 사실·숫자는 그대로 두고 결론과 액션이 먼저 보이게 재작성. | `/plugin install madup-writing@madup` |
+| `geo-page-audit` | 웹페이지가 생성형 AI 검색에 인용될 수 있는 상태인지 실측 점검. "이 페이지 GEO 점검해줘", "AI 검색에 왜 안 나오지"라고 치면 AI 크롤러 접근·robots.txt·JSON-LD·텍스트 밀도를 진단하고 개발팀 전달용 요청서까지 정리. API 키 불필요. | `/plugin install geo-page-audit@madup` |
 
 ## 사용 예
 

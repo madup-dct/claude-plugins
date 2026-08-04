@@ -29,6 +29,12 @@
       "source": "./plugins/madup-writing",
       "description": "슬랙·보고서·제안서·발표 카피용 한글 실무 문안을 매드업 톤으로 정리하는 글쓰기 스킬 — 사실·숫자는 그대로 두고 결론과 액션이 먼저 보이게 다듬음.",
       "version": "1.2.0"
+    },
+    {
+      "name": "geo-page-audit",
+      "source": "./plugins/geo-page-audit",
+      "description": "웹페이지가 생성형 AI 검색에 인용될 수 있는 상태인지 실측 점검 — AI 크롤러 접근·robots.txt allowlist·JSON-LD·텍스트 밀도를 진단하고 개발팀 전달용 개선 요청서로 정리.",
+      "version": "1.0.0"
     }
   ]
 }
