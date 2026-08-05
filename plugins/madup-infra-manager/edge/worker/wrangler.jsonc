@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "madup-infra-manager-edge-worker",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-04",
+  "workers_dev": false,
+  "vars": {
+    "MIM_CONTROL_PUBLIC_HOSTNAME": "mim.madup.app",
+    "MIM_APP_HOST_SUFFIX": "madup.app",
+    "MIM_PROJECT_NUMBER": "PROJECT_NUMBER_PLACEHOLDER",
+    "MIM_CONTROL_ORIGIN": "https://CONTROL-SERVICE-PLACEHOLDER.run.app",
+    "MIM_APP_GATEWAY_ORIGIN": "https://APP-GATEWAY-PLACEHOLDER.run.app",
+    "MIM_CONTROL_ALLOWED_ROUTES": "POST /mcp\nGET /healthz\nGET /readyz\nGET /mcp/ws\nGET /v1/operations/{id}\nGET /v1/failures/{id}\nGET /v1/workloads\nGET /v1/usage\nGET /v1/plan/deploy?*\nGET /v1/plan/schedule?*\nGET /dashboard\nGET /static/{asset}\nGET /v1/secrets/handoff?*\nPOST /v1/deployments\nPOST /v1/schedules\nPOST /v1/schedules/{schedule_id}/pause\nPOST /v1/schedules/{schedule_id}/resume\nPOST /v1/secrets/handoff?*\nPOST /v1/webhooks/github",
+    "MIM_CONTROL_ORIGIN_HMAC_KEY_ID": "control-current",
+    "MIM_APP_GATEWAY_ORIGIN_HMAC_KEY_ID": "app-current"
+  }
+}

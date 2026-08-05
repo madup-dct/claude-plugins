@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "madup-infra-manager": {
+      "type": "http",
+      "url": "https://mim.madup.app/mcp"
+    }
+  }
+}

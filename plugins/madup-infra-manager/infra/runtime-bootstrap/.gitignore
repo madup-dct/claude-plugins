@@ -1,0 +1,4 @@
+.state/
+__pycache__/
+*.private.json
+*.private.json.sha256

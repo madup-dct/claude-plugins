@@ -1,0 +1,9 @@
+{
+  "name": "madup-infra-manager",
+  "description": "MIM 계획 기반으로 승인된 매드업 인프라 작업을 안내하는 운영 스킬. 배포·스케줄·상태·사용량·복구 요청을 typed 도구로만 연결한다.",
+  "version": "0.2.0",
+  "author": {
+    "name": "MADUP DCT",
+    "email": "dc_team@madup.com"
+  }
+}

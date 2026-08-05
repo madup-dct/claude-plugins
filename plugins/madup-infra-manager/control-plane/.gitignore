@@ -1,0 +1,6 @@
+.venv/
+.ruff_cache/
+src/*.egg-info/
+src/**/__pycache__/
+tests/**/__pycache__/
+bootstrap/**/__pycache__/

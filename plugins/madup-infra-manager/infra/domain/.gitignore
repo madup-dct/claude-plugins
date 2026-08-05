@@ -1,0 +1,3 @@
+config.env
+protected-projects.exact
+__pycache__/

@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "project_id": "mim-prod-123456",
+  "project_number": "123456789012",
+  "organization_id": "123456789012",
+  "billing_account_id": "ABCDEF-123456-7890AB",
+  "operator_email": "operator.name@madup.com",
+  "cloudflare_issuer": "https://madup.cloudflareaccess.com",
+  "cloudflare_audience": "cf-audience-public-123",
+  "app_cloudflare_issuer": "https://madup-marketing.cloudflareaccess.com",
+  "app_cloudflare_audience": "cf-app-audience-public-123",
+  "public_host_suffix": "madup.app",
+  "region": "asia-northeast3",
+  "directory_required_group_email": "mim-users@madup.com",
+  "admin_members": [
+    "group:mim-admins@madup.com",
+    "user:operator.name@madup.com"
+  ],
+  "breakglass_members": [],
+  "directory": {
+    "admin_subject": "directory.admin@madup.com",
+    "service_account_email": "mim-identity-sync@mim-prod-123456.iam.gserviceaccount.com"
+  },
+  "origin_hmac_keys": [
+    {
+      "key_id": "edge-current",
+      "secret_version": "projects/mim-prod-123456/secrets/mim-edge-origin-v1/versions/123"
+    }
+  ],
+  "app_origin_hmac_keys": [
+    {
+      "key_id": "app-current",
+      "secret_version": "projects/mim-prod-123456/secrets/mim-app-gateway-origin-v1/versions/123"
+    },
+    {
+      "key_id": "app-previous",
+      "secret_version": "projects/mim-prod-123456/secrets/mim-app-gateway-origin-v0/versions/122"
+    }
+  ],
+  "desired_state_signing_key_id": "deploy-key-yyyymm",
+  "desired_state_signing_secret_version": "projects/mim-prod-123456/secrets/mim-desired-state-signing/versions/123",
+  "github_webhook_secret_version": "projects/mim-prod-123456/secrets/mim-github-webhook/versions/123",
+  "github_app": {
+    "app_id": "123456",
+    "private_key_secret_version": "projects/mim-prod-123456/secrets/mim-github-app-key/versions/123",
+    "installation_id": 303,
+    "allowed_repository_ids": [
+      101
+    ],
+    "bindings": [
+      {
+        "repository_numeric_id": 101,
+        "owner": "madupmarketing",
+        "name": "sample-app",
+        "installation_id": 303,
+        "repository_resource": "projects/mim-prod-123456/locations/asia-northeast3/connections/mim-github/repositories/sample-app"
+      }
+    ]
+  },
+  "build": {
+    "builder_image": "asia-northeast3-docker.pkg.dev/mim-prod-123456/mim-platform/mim-builder@sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "build_service_account": "projects/mim-prod-123456/serviceAccounts/mim-build@mim-prod-123456.iam.gserviceaccount.com"
+  },
+  "deploy_worker": {
+    "url": "https://mim-deploy-worker-123456789012.asia-northeast3.run.app/internal/deploy",
+    "audience": "https://mim-deploy-worker-123456789012.asia-northeast3.run.app",
+    "service_account_email": "mim-deploy-worker@mim-prod-123456.iam.gserviceaccount.com"
+  },
+  "app_gateway": {
+    "url": "https://mim-app-gateway-123456789012.asia-northeast3.run.app",
+    "audience": "https://mim-app-gateway-123456789012.asia-northeast3.run.app",
+    "service_account_email": "mim-app-gateway@mim-prod-123456.iam.gserviceaccount.com"
+  },
+  "app_authorization": {
+    "url": "https://mim-schedule-gateway-123456789012.asia-northeast3.run.app/v1/apps/authorize",
+    "audience": "https://mim-schedule-gateway-123456789012.asia-northeast3.run.app",
+    "service_account_email": "mim-schedule-gateway@mim-prod-123456.iam.gserviceaccount.com"
+  },
+  "schedule_gateway": {
+    "url": "https://mim-schedule-gateway-123456789012.asia-northeast3.run.app/v1/schedules/execute",
+    "audience": "https://mim-schedule-gateway-123456789012.asia-northeast3.run.app",
+    "service_account_email": "mim-schedule-gateway@mim-prod-123456.iam.gserviceaccount.com"
+  }
+}

@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -ne 2 ]]; then
+  printf 'pre-push hook requires exactly REMOTE_NAME and REMOTE_URL\n' >&2
+  exit 2
+fi
+
+remote_name="${1}"
+remote_url="${2}"
+if [[ -z "${remote_name}" || -z "${remote_url}" ]]; then
+  printf 'pre-push hook requires non-empty remote arguments\n' >&2
+  exit 2
+fi
+
+require_regular_readable_file() {
+  local path="${1}"
+  local label="${2}"
+  if [[ -L "${path}" ]]; then
+    printf '%s must not be a symlink\n' "${label}" >&2
+    exit 1
+  fi
+  if [[ ! -f "${path}" || ! -r "${path}" ]]; then
+    printf '%s is unavailable\n' "${label}" >&2
+    exit 1
+  fi
+}
+
+hook_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+repo_root="$(git -C "${hook_dir}" rev-parse --show-toplevel 2>/dev/null)" || {
+  printf 'pre-push hook must run inside the repository\n' >&2
+  exit 1
+}
+hook_path="${repo_root}/.githooks/pre-push"
+scanner="${repo_root}/plugins/madup-infra-manager/infra/release/public_release_guard.py"
+default_denylist="${repo_root}/plugins/madup-infra-manager/infra/release/denylist.exact"
+
+require_regular_readable_file "${hook_path}" "pre-push hook"
+require_regular_readable_file "${scanner}" "public release scanner"
+
+exec env MIM_PUBLIC_RELEASE_DENYLIST_FILE="${default_denylist}" python3 "${scanner}" pre-push "${remote_name}" "${remote_url}"

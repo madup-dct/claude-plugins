@@ -1,0 +1,98 @@
+name: MIM Public Release Gate
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_sha:
+        description: "Exact 40-character lowercase commit SHA to gate"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mim-public-release-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  exact-gate:
+    runs-on: ubuntu-latest
+    environment: mim-public-release
+    steps:
+      - name: Reject non-main dispatch
+        if: ${{ github.ref != 'refs/heads/main' }}
+        run: |
+          set -euo pipefail
+          echo "workflow_dispatch must run on refs/heads/main" >&2
+          exit 1
+
+      - name: Check out trusted main repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: trusted
+          ref: refs/heads/main
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check out candidate repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: candidate
+          ref: ${{ inputs.candidate_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.13"
+
+      - name: Validate candidate SHA and prepare main baseline
+        env:
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+        run: |
+          set -euo pipefail
+          candidate_dir="${GITHUB_WORKSPACE}/candidate"
+          if [[ ! "${CANDIDATE_SHA}" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "candidate_sha must be exact 40-character lowercase hex" >&2
+            exit 1
+          fi
+          candidate_head="$(git -C "$candidate_dir" rev-parse HEAD)"
+          if [[ "${candidate_head}" != "${CANDIDATE_SHA}" ]]; then
+            echo "candidate checkout does not match candidate_sha" >&2
+            exit 1
+          fi
+          git -C "$candidate_dir" fetch --no-tags origin refs/heads/main:refs/remotes/origin/main
+
+      - name: Run trusted exact gate before any candidate code
+        env:
+          MIM_PUBLIC_RELEASE_DENYLIST_EXACT: ${{ secrets.MIM_PUBLIC_RELEASE_DENYLIST_EXACT }}
+        run: |
+          set -euo pipefail
+          candidate_dir="${GITHUB_WORKSPACE}/candidate"
+          scanner_path="${GITHUB_WORKSPACE}/trusted/plugins/madup-infra-manager/infra/release/public_release_guard.py"
+          denylist_file="${RUNNER_TEMP}/mim-public-release-denylist.exact"
+          cleanup() {
+            rm -f -- "$denylist_file"
+            unset MIM_PUBLIC_RELEASE_DENYLIST_EXACT || true
+            unset MIM_PUBLIC_RELEASE_DENYLIST_FILE || true
+          }
+          trap cleanup EXIT HUP INT TERM
+          export MIM_PUBLIC_RELEASE_DENYLIST_FILE="${denylist_file}"
+          umask 077
+          printf '%s\n' "$MIM_PUBLIC_RELEASE_DENYLIST_EXACT" > "$denylist_file"
+          chmod 600 "${denylist_file}"
+          cd "${candidate_dir}"
+          python3 "$scanner_path" verify --local --base-ref origin/main --require-exact-values
+          python3 "$scanner_path" verify --range origin/main..HEAD
+          rm -f -- "$denylist_file"
+          unset MIM_PUBLIC_RELEASE_DENYLIST_EXACT
+          unset MIM_PUBLIC_RELEASE_DENYLIST_FILE
+          trap - EXIT HUP INT TERM
+
+      - name: Run candidate public tests after secret cleanup
+        run: |
+          set -euo pipefail
+          cd "${GITHUB_WORKSPACE}/candidate"
+          python3 -m unittest tests/test_public_release_guard.py tests/test_mim_release_contract.py tests/test_madup_infra_manager_plugin.py tests/test_mim_public_boundary.py -v

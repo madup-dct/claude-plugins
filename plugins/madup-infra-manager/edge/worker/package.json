@@ -1,0 +1,9 @@
+{
+  "name": "@madup/mim-edge-worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "deploy:dry-run": "npx wrangler deploy --dry-run"
+  }
+}

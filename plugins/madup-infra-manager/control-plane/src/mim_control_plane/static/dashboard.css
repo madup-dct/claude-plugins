@@ -1,0 +1,86 @@
+:root {
+  --paper: #f3f0e7;
+  --ink: #14243d;
+  --navy: #223b5c;
+  --orange: #d46c2f;
+  --green: #2f7d52;
+  --line: rgba(20, 36, 61, 0.18);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background:
+    linear-gradient(135deg, rgba(20, 36, 61, 0.04), transparent 38%),
+    var(--paper);
+  color: var(--ink);
+  font-family: "Avenir Next", "Noto Sans KR", sans-serif;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.hero,
+.panel {
+  grid-column: span 12;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.46);
+  padding: 1rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.5rem;
+  color: var(--orange);
+  font-family: "Space Mono", monospace;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+}
+
+.lede {
+  max-width: 48rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+th,
+td {
+  padding: 0.65rem 0.4rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+th {
+  color: var(--navy);
+  font-family: "Space Mono", monospace;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+@media (min-width: 900px) {
+  .hero {
+    grid-column: span 7;
+  }
+
+  .panel {
+    grid-column: span 6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto;
+    transition: none !important;
+    animation: none !important;
+  }
+}
