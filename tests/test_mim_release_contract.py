@@ -97,9 +97,13 @@ class TempRepoHarness:
             printf '%s\\n' "$@" > "${log_dir}/${call_id}.args"
             cat > "${log_dir}/${call_id}.stdin"
             if [[ -n "${MIM_PUBLIC_RELEASE_DENYLIST_FILE:-}" ]]; then
-              printf '%s\n' "${MIM_PUBLIC_RELEASE_DENYLIST_FILE}" > "${log_dir}/${call_id}.denylist_path"
+              printf '%s\\n' "${MIM_PUBLIC_RELEASE_DENYLIST_FILE}" > "${log_dir}/${call_id}.denylist_path"
               if [[ -e "${MIM_PUBLIC_RELEASE_DENYLIST_FILE}" ]]; then
-                stat -f '%Lp' "${MIM_PUBLIC_RELEASE_DENYLIST_FILE}" > "${log_dir}/${call_id}.denylist_mode"
+                if stat -f '%Lp' "${MIM_PUBLIC_RELEASE_DENYLIST_FILE}" > "${log_dir}/${call_id}.denylist_mode" 2>/dev/null; then
+                  :
+                else
+                  stat -c '%a' "${MIM_PUBLIC_RELEASE_DENYLIST_FILE}" > "${log_dir}/${call_id}.denylist_mode"
+                fi
                 wc -c < "${MIM_PUBLIC_RELEASE_DENYLIST_FILE}" | tr -d '[:space:]' > "${log_dir}/${call_id}.denylist_size"
               fi
             fi
